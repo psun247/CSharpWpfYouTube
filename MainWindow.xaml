@@ -1,0 +1,161 @@
+﻿<Window x:Class="CSharpWpfYouTube.MainWindow"                        
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"                        
+        xmlns:ui="http://schemas.modernwpf.com/2019"                
+        mc:Ignorable="d"             
+        Icon="/CSharpWpfYouTube;component/CSharpWpfYouTube.ico" 
+        WindowStartupLocation="CenterScreen"        
+        Title="{Binding AppTitle}" Height="960" Width="1450" MinHeight="600" MinWidth="1170">
+    <Grid Background="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*" MinHeight="230" />
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" BorderThickness="0" BorderBrush="Black" >
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1" >
+                    <GradientStop Color="#AA2196F3" Offset="0" />
+                    <GradientStop Color="#662196F3" Offset="1.0" />
+                </LinearGradientBrush>
+            </Border.Background>
+
+            <DockPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Groups" FontSize="24" FontWeight="SemiBold" Margin="20,7,20,0" />
+                    <Label Content=" " Background="WhiteSmoke" />
+                </StackPanel>
+                <ListView ItemsSource="{Binding VideoGroupList}" SelectedItem="{Binding SelectedVideoGroup}"
+                          ScrollViewer.VerticalScrollBarVisibility="Disabled" >
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True" >
+                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                    <!--Note: Background has no effect-->
+                                    <Setter Property="Background" Value="Transparent" />
+                                </Trigger>
+                                <Trigger Property="IsSelected" Value="False" >
+                                    <Setter Property="Background" Value="WhiteSmoke" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding .}" FontSize="22" Height="36" Padding="10,0" Margin="10" />
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <Label Content=" " Background="WhiteSmoke" />
+                <Label Content="Organize YouTube videos in groups and play videos in embedded WebView2 control" 
+                       FontSize="20" Foreground="Navy" Margin="20,10,0,0" />
+            </DockPanel>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="290" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!--1st column - Video group/info list-->
+            <Border Grid.Column="0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="48" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Background="#662196F3">
+                        <DockPanel Margin="0">
+                            <TextBlock Text="Selected Group" FontSize="22" FontWeight="Normal" Margin="15,7,10,10" />
+                            <TextBlock Text="{Binding SelectedVideoGroup}" FontSize="22" FontWeight="SemiBold" />
+                            <!--Gap for the look-->
+                            <Rectangle Width="18" Fill="WhiteSmoke" HorizontalAlignment="Right" Margin="0,-1,0,0" />
+                        </DockPanel>
+                    </Border>
+
+                    <!--Filtered VideoInfoByGroupList by SelectedVideoGroup-->
+                    <DataGrid x:Name="videoHistoryListDataGrid" Grid.Row="1"
+                        ItemsSource="{Binding VideoInfoByGroupList}" SelectedItem="{Binding SelectedVideoInfo}"                                                                                        
+                        ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                        GridLinesVisibility="None" BorderThickness="0" Background="#FFECECEC">
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="Video" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <!--Need Grid (not StackPanel) for TextBlock to wrap-->
+                                        <Grid Background="#19000000">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="90" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <Ellipse Height="70" Width="70" Margin="0,10">
+                                                <Ellipse.Fill>
+                                                    <ImageBrush ImageSource="{Binding CoverUrl, FallbackValue={x:Null}}" Stretch="UniformToFill" />
+                                                </Ellipse.Fill>
+                                            </Ellipse>
+                                            <StackPanel Grid.Column="1">
+                                                <TextBlock Text="{Binding Description}" TextWrapping="Wrap" FontSize="20" Padding="5,2" Margin="5,7,5,10" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Border>
+
+            <!--2nd column - Import, url, Open browser + WebView2-->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="70" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Border Background="LightGray">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Orientation="Horizontal">
+                            <Button Content="Import" ToolTip="Import current video to the video list in the left panel"                            
+                                Command="{Binding ImportCurrentVideoCommand}" Margin="15,0,0,0" />
+                        </StackPanel>
+                        <TextBox Grid.Column="1" Text="{Binding CurrentVideoUri, UpdateSourceTrigger=PropertyChanged}" 
+                                    ui:ControlHelper.PlaceholderText="Start with https://www.youtube.com and hit Enter key to navigate" 
+                                    FontSize="16" Foreground="Navy"
+                                    Height="36" Margin="10,5,10,8">
+                            <!--UpdateSourceTrigger=PropertyChanged needed for KeyBinding to work-->
+                            <TextBox.InputBindings>
+                                <KeyBinding Command="{Binding GoToVideoUrlCommand}" Key="Enter" />
+                            </TextBox.InputBindings>
+                        </TextBox>
+                        <Button Grid.Column="2" Content="Open with Web Browser" ToolTip="Open current video with default browser"                            
+                                Command="{Binding OpenAtYouTubeWebSiteCommand}" Margin="5,0,15,0" />
+                    </Grid>
+                </Border>
+                <ContentControl Grid.Row="1" Content="{Binding WebView2Control}" />
+            </Grid>
+        </Grid>
+
+        <Border Grid.Row="2" Background="#662196F3">
+            <TextBlock Text="{Binding StatusMessage}" FontSize="16" FontWeight="SemiBold" 
+                   HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,5" />
+        </Border>
+    </Grid>
+</Window>
