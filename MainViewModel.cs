@@ -25,7 +25,9 @@ namespace CSharpWpfYouTube
             _mainService = new MainService(dbFilePath);
             _videoInfoList = new List<VideoInfo>();
             InitializeWebView2();
-            AppTitle = $"{App.AppName} - by Peter Sun (WPF WebView2, CommunityToolkit.Mvvm, " +
+
+            Version ver = Environment.Version;
+            AppTitle = $"{App.AppName} - by Peter Sun (.NET {ver.Major}.{ver.Minor}.{ver.Build} Runtime, WPF WebView2, CommunityToolkit.Mvvm, " +
                         "EntityFrameworkCore.Sqlite, ModernWpfUI, RestoreWindowPlace)";
 #if DEBUG
             AppTitle += " - Debug";
