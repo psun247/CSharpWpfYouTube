@@ -23,42 +23,19 @@
                 </LinearGradientBrush>
             </Border.Background>
 
-            <DockPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Label Content="Groups" FontSize="24" FontWeight="SemiBold" Margin="20,7,20,0" />
-                    <Label Content=" " Background="WhiteSmoke" />
-                </StackPanel>
-                <ListView ItemsSource="{Binding VideoGroupList}" SelectedItem="{Binding SelectedVideoGroup}"
-                          ScrollViewer.VerticalScrollBarVisibility="Disabled" >
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="ListViewItem">
-                            <Style.Triggers>
-                                <Trigger Property="IsSelected" Value="True" >
-                                    <Setter Property="FontWeight" Value="SemiBold" />
-                                    <!--Note: Background has no effect-->
-                                    <Setter Property="Background" Value="Transparent" />
-                                </Trigger>
-                                <Trigger Property="IsSelected" Value="False" >
-                                    <Setter Property="Background" Value="WhiteSmoke" />
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ListView.ItemContainerStyle>
-                    <ListView.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel Orientation="Horizontal" />
-                        </ItemsPanelTemplate>
-                    </ListView.ItemsPanel>
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding .}" FontSize="22" Height="36" Padding="10,0" Margin="10" />
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-                <Label Content=" " Background="WhiteSmoke" />
-                <Label Content="Organize YouTube videos in groups and play videos in embedded WebView2 control" 
-                       FontSize="20" Foreground="Navy" Margin="20,10,0,0" />
-            </DockPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Label Content="Groups" FontSize="20"  Margin="20,10,10,0" />
+                <ComboBox Grid.Column="1" ItemsSource="{Binding VideoGroupList}" SelectedItem="{Binding SelectedVideoGroup}"                            
+                            Height="30" FontSize="18" FontWeight="SemiBold" Background="#EDEDED" Margin="0,10,0,0" />
+                <Label Grid.Column="2" Content="Organize YouTube videos in groups (in SQLite DB) and play videos in embedded WebView2 control" 
+                       FontSize="20" Foreground="Navy" Margin="15,10,0,0" />
+            </Grid>
         </Border>
 
         <Grid Grid.Row="1">

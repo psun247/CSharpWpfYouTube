@@ -311,10 +311,10 @@ namespace CSharpWpfYouTube
                 else
                 {
                     // Create defaults on empty. Videos imported by a user (from UI) will be from YouTube.
-                    _currentVideoUri = "https://github.com/psun247/CSharpWpfChatGPT";
+                    _currentVideoUri = "https://github.com/psun247/ShazamDesk";
                     initialVideoInfo = new VideoInfo
                     {
-                        Description = "C# WPF ChatGPT by Peter Sun",
+                        Description = "WPF ChatGPT + Shazam by Peter Sun",
                         CoverUrl = "/CSharpWpfYouTube;component/Resources/Info.png",
                         Link = _currentVideoUri,
                     };

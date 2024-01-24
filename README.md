@@ -11,7 +11,7 @@ To run the app without compiling it,
 3. Unzip the file and run CSharpWpfYouTube.exe
 
 # Setup and Supporting Libraries
-Build with Visual Studio 2022 (Community version OK) for .NET 6 and 7
+Build with Visual Studio 2022 (Community version OK) for .NET 6 and 8
 
 Microsoft.Web.WebView2 (for WPF / WinForms)
 

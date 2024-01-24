@@ -58,6 +58,9 @@ namespace CSharpWpfYouTube
         private static bool CheckInstanceRunningStatus(out string error)
         {
             error = string.Empty;
+#if DEBUG
+            return true;
+#else            
             _InstanceMutex = new Mutex(false, $"{App.AppName}ClientMutex");
             bool owned = _InstanceMutex.WaitOne(TimeSpan.Zero, false);
             if (!owned)
@@ -65,6 +68,7 @@ namespace CSharpWpfYouTube
                 error = $"{App.AppName} is already running. Only one instance is allowed to run at a time.";
             }
             return owned;
+#endif
         }
 
         private void SetupRestoreWindowPlace(MainWindow mainWindow)
