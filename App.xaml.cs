@@ -8,8 +8,10 @@ namespace CSharpWpfYouTube
 {
     public partial class App : Application
     {
+#if !DEBUG
         // static to be across app instances
         private static Mutex? _InstanceMutex;
+#endif
         private WindowPlace? _windowPlace;
 
         public static string AppName => "CSharpWpfYouTube";
@@ -60,7 +62,7 @@ namespace CSharpWpfYouTube
             error = string.Empty;
 #if DEBUG
             return true;
-#else            
+#else
             _InstanceMutex = new Mutex(false, $"{App.AppName}ClientMutex");
             bool owned = _InstanceMutex.WaitOne(TimeSpan.Zero, false);
             if (!owned)
