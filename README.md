@@ -1,7 +1,7 @@
 # CSharpWpfYouTube
 C# WPF application that imports YouTube videos in a SQLite database with info from YouTube data service API
 
-![image](https://github.com/psun247/CSharpWpfYouTube/assets/31531761/b60f1223-9887-49a1-98a2-48c219b9caf9)
+![image](https://github.com/psun247/CSharpWpfYouTube/assets/31531761/2396154b-a6b7-4e44-8bde-055ea4173677)
 
 # Run
 To run the app without compiling it,
