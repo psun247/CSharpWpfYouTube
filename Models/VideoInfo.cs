@@ -14,7 +14,7 @@ namespace CSharpWpfYouTube.Models
         // Group name in the top-left group list for binding VideoInfoList        
         public string VideoGroup { get; set; } = HomeVideoGroup;
 
-        // Note: mostly empty because YouTube data service API is NOT used
+        // From YouTube data service API
         public string Description { get; set; } = string.Empty;
 
         // https://www.youtube.com/watch?v=d_l-st8Q1S0
@@ -23,6 +23,7 @@ namespace CSharpWpfYouTube.Models
         // Leave it as null (not string.Empty) as default because string.Empty
         // causes an exception as invalid Image's Source in XAML        
         public string? CoverUrl { get; set; }
+        public string? Released { get; set; }
 
         public bool IsSameVideo(string link) =>
                         Link.IsNotBlank() &&

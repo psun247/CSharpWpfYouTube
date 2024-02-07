@@ -1,13 +1,13 @@
 # CSharpWpfYouTube
-C# WPF application that plays YouTube videos with links stored by groups in a SQLite database
+C# WPF application that imports YouTube videos in a SQLite database with info from YouTube data service API
 
 ![image](https://github.com/psun247/CSharpWpfYouTube/assets/31531761/b60f1223-9887-49a1-98a2-48c219b9caf9)
 
 # Run
 To run the app without compiling it,
 
-1. Click CSharpWpfYouTube_v1.1 under Releases on the right side of this page
-2. Download CSharpWpfYouTube_v1.1_net6.0-windows.zip
+1. Click CSharpWpfYouTube_v1.2 under Releases on the right side of this page
+2. Download CSharpWpfYouTube_v1.2_net6.0-windows.zip
 3. Unzip the file and run CSharpWpfYouTube.exe
 
 # Setup and Supporting Libraries

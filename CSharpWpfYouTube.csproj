@@ -42,11 +42,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
-    <Folder Include="Services\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="LICENSE">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>

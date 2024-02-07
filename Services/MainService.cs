@@ -64,7 +64,7 @@ namespace CSharpWpfYouTube.Services
                 }
             }
         }
-       
+
         public List<string> EnsureLoadVideoGroupList()
         {
             List<string> videoGroupList;
@@ -78,8 +78,8 @@ namespace CSharpWpfYouTube.Services
                 videoGroupList = slVideoGroupList.Select(x => x.Name).ToList();
             }
             else
-            {                
-                videoGroupList = new List<string> { VideoInfo.HomeVideoGroup, "Music", "Fun", "Other" };                          
+            {
+                videoGroupList = new List<string> { VideoInfo.HomeVideoGroup, "Music", "Fun", "Other" };
                 InsertVideoGroupList(videoGroupList, slVideoGroupList);
             }
             return videoGroupList;
@@ -147,7 +147,7 @@ namespace CSharpWpfYouTube.Services
                 }
             }
         }
-        
+
         private System.Linq.Expressions.Expression<Func<SLVideoInfo, bool>> IsSameVideo(string videoInfolink)
         {
             // Still can't call a function like input.CallSomething(), where input is SLVideoInfo, but can use ToLower()
@@ -163,23 +163,14 @@ namespace CSharpWpfYouTube.Services
             if (videoInfoList.Any(x => x.IsSameVideo(link)))
             {
                 isNewVideo = false;
-
-                if (videoInfo.VideoGroup == videoGroup)
-                {
-                    statusMessage = "Already previously imported";
-                }
-                else
-                {
-                    statusMessage = $"Already previously imported into group '{videoInfo.VideoGroup}'";
-                }
+                statusMessage = "Already previously imported";
             }
             else
             {
                 isNewVideo = true;
-
                 videoInfo.VideoGroup = videoGroup;
-                AddVideoInfo(videoInfo);                
-                videoInfoList.Add(videoInfo);                
+                AddVideoInfo(videoInfo);
+                videoInfoList.Add(videoInfo);
 
                 // Because no description for the video, hence just the group
                 statusMessage = $"Imported into group '{videoGroup}'";

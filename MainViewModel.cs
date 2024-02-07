@@ -17,17 +17,22 @@ namespace CSharpWpfYouTube
 
         private AppSettings _appSettings;
         private MainService _mainService;
+        private YouTubeDataService _youtubeDataService;
         private List<VideoInfo> _videoInfoList;
 
         public MainViewModel(string dbFilePath)
         {
             _appSettings = new AppSettings();
             _mainService = new MainService(dbFilePath);
+            // Note: if this key doesn't work (e.g. expired), get your key at:
+            //          https://console.cloud.google.com/apis/api/youtube.googleapis.com/overview
+            string youtubeDataApiKey = "AIzaSyCUV6j6vCUTD9W2aiTOV-6XkV0Yl8tjFiA";
+            _youtubeDataService = new YouTubeDataService(youtubeDataApiKey);
             _videoInfoList = new List<VideoInfo>();
             InitializeWebView2();
 
             Version ver = Environment.Version;
-            AppTitle = $"{App.AppName} - by Peter Sun (.NET {ver.Major}.{ver.Minor}.{ver.Build} Runtime, WPF WebView2, CommunityToolkit.Mvvm, " +
+            AppTitle = $"{App.AppName} - by Peter Sun (.NET {ver.Major}.{ver.Minor}.{ver.Build} runtime, WPF WebView2, CommunityToolkit.Mvvm, " +
                         "EntityFrameworkCore.Sqlite, ModernWpfUI, RestoreWindowPlace)";
 #if DEBUG
             AppTitle += " - Debug";
@@ -39,7 +44,7 @@ namespace CSharpWpfYouTube
         public WebView2? WebView2Control { get; private set; }
         // Video address in the textbox (whenever navigated to)
         [ObservableProperty]
-        string _currentVideoUri = string.Empty;
+        string _currentVideoUrl = string.Empty;
         [ObservableProperty]
         ObservableCollection<string> _videoGroupList = new ObservableCollection<string>();
         [ObservableProperty]
@@ -167,18 +172,18 @@ namespace CSharpWpfYouTube
                 {
                     // Link is like https://www.youtube.com/watch?v=d_l-st8Q1S0, 
                     // https://www.youtube.com/results?search_query=....."                    
-                    _currentVideoUri = value.Link;
+                    _currentVideoUrl = value.Link;
                 }
                 else
-                {                    
-                    _currentVideoUri = VideoInfo.YouTubeHomeUri;
+                {
+                    _currentVideoUrl = VideoInfo.YouTubeHomeUri;
                 }
 
                 // YouTube tab (go to the last navigated video uri)
-                BindWebView2Control(_currentVideoUri);                
-                OnPropertyChanged(nameof(CurrentVideoUri));
+                BindWebView2Control(_currentVideoUrl);
+                OnPropertyChanged(nameof(CurrentVideoUrl));
 
-                _mainService.UpdateAppSetting(AppSettings.SelectedVideoLinkName, _currentVideoUri);
+                _mainService.UpdateAppSetting(AppSettings.SelectedVideoLinkName, _currentVideoUrl);
 
                 if (value.Description.IsNotBlank())
                 {
@@ -200,7 +205,7 @@ namespace CSharpWpfYouTube
         {
             try
             {
-                BindWebView2Control(CurrentVideoUri);
+                BindWebView2Control(CurrentVideoUrl);
             }
             catch (Exception ex)
             {
@@ -209,15 +214,15 @@ namespace CSharpWpfYouTube
         }
 
         [RelayCommand]
-        private void ImportCurrentVideo()
+        private async void ImportCurrentVideo()
         {
-            if (!GeneralHelper.IsValidUri(_currentVideoUri))
+            if (!GeneralHelper.IsValidUri(_currentVideoUrl))
             {
                 StatusMessage = "A video needs to be navigated to for 'Import'";
                 return;
             }
 
-            if (!GeneralHelper.IsYouTubeVideoUri(_currentVideoUri))
+            if (!GeneralHelper.IsYouTubeVideoUri(_currentVideoUrl))
             {
                 StatusMessage = "Must be a YouTube video to be imported";
                 return;
@@ -225,16 +230,8 @@ namespace CSharpWpfYouTube
 
             try
             {
-                GeneralHelper.CleanYouTubeUri(ref _currentVideoUri);
-                var videoInfo = new VideoInfo
-                {
-                    // With YouTubeVideoUri, from https://www.youtube.com/watch?v=d_l-st8Q1S0,
-                    // make https://img.youtube.com/vi/d_l-st8Q1S0/0.jpg
-                    CoverUrl = _currentVideoUri.Replace("www.youtube", "img.youtube")
-                                           .Replace("watch?v=", "vi/") + "/0.jpg",
-                    Link = _currentVideoUri,
-                };
-
+                GeneralHelper.CleanYouTubeUri(ref _currentVideoUrl);
+                VideoInfo videoInfo = await _youtubeDataService.CreateYouTubeVideoMatch(_currentVideoUrl);               
                 _mainService.ImportVideo(_videoInfoList, _selectedVideoGroup, ref videoInfo,
                                             out bool isNewVideo, out string statusMessage);
                 if (isNewVideo)
@@ -262,9 +259,9 @@ namespace CSharpWpfYouTube
         {
             try
             {
-                if (_currentVideoUri.IsNotBlank() && GeneralHelper.IsValidUri(_currentVideoUri))
+                if (_currentVideoUrl.IsNotBlank() && GeneralHelper.IsValidUri(_currentVideoUrl))
                 {
-                    await GeneralHelper.ExecuteOpenUrlCommandAsync(_currentVideoUri);
+                    await GeneralHelper.ExecuteOpenUrlCommandAsync(_currentVideoUrl);
                 }
                 else
                 {
@@ -289,7 +286,7 @@ namespace CSharpWpfYouTube
             {
                 // Always update the textbox (so can copy to clipboard)
                 // not the same as YouTube behavior (only update at the top)                
-                CurrentVideoUri = WebView2Control.Source.AbsoluteUri;
+                CurrentVideoUrl = WebView2Control.Source.AbsoluteUri;
             };
             OnPropertyChanged(nameof(WebView2Control));
         }
@@ -297,7 +294,7 @@ namespace CSharpWpfYouTube
         // Ensure to avoid empty YouTube control
         private VideoInfo EnsureInitialVideoInfo(List<VideoInfo> videoInfoList, string selectedVideoLink)
         {
-            VideoInfo? initialVideoInfo = null;            
+            VideoInfo? initialVideoInfo = null;
             if (selectedVideoLink.IsNotBlank())
             {
                 initialVideoInfo = videoInfoList.FirstOrDefault(x => x.Link == selectedVideoLink);
@@ -311,20 +308,20 @@ namespace CSharpWpfYouTube
                 else
                 {
                     // Create defaults on empty. Videos imported by a user (from UI) will be from YouTube.
-                    _currentVideoUri = "https://github.com/psun247/ShazamDesk";
+                    _currentVideoUrl = "https://github.com/psun247/ShazamDesk";
                     initialVideoInfo = new VideoInfo
                     {
                         Description = "WPF ChatGPT + Shazam by Peter Sun",
                         CoverUrl = "/CSharpWpfYouTube;component/Resources/Info.png",
-                        Link = _currentVideoUri,
+                        Link = _currentVideoUrl,
                     };
                     _mainService.ImportVideo(_videoInfoList, VideoInfo.HomeVideoGroup, ref initialVideoInfo,
                                              out bool _, out string _);
                     var videoInfo = new VideoInfo
                     {
-                        Description = "French Open Novak Djokovic vs Carlos Alcaraz",
-                        CoverUrl = "https://img.youtube.com/vi/K6VuFCwUMnQ/0.jpg",
-                        Link = "https://www.youtube.com/watch?v=K6VuFCwUMnQ",
+                        Description = "Jannik Sinner v Daniil Medvedev Extended Highlights | Australian Open 2024 Final",
+                        CoverUrl = "https://img.youtube.com/vi/b90INDbXX7Y/0.jpg",
+                        Link = "https://www.youtube.com/watch?v=b90INDbXX7Y",
                     };
                     _mainService.ImportVideo(_videoInfoList, VideoInfo.HomeVideoGroup, ref videoInfo,
                                              out bool _, out string _);
